@@ -85,7 +85,8 @@ func deleteUser(w http.ResponseWriter, r *http.Request) {
 	for index, user := range users {
 		if fmt.Sprintf("%d", user.ID) == params["id"] {
 			users = append(users[:index], users[index+1:]...)
-			return // ❌ BUG: Tidak ada response yang mengonfirmasi penghapusan
+			w.WriteHeader(http.StatusNoContent)
+			return
 		}
 	}
 	http.Error(w, "User not found", 404)
