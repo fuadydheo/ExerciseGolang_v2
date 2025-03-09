@@ -66,6 +66,7 @@ func updateUser(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	params := mux.Vars(r)
 
+	log.Println("Merubah pengguna dengan id:", params["id"])
 	for index, user := range users {
 		if fmt.Sprintf("%d", user.ID) == params["id"] {
 			var updatedUser User
@@ -84,8 +85,10 @@ func deleteUser(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	params := mux.Vars(r)
 
+	log.Println("Menghapus pengguna dengan id:", params["id"])
 	for index, user := range users {
 		if fmt.Sprintf("%d", user.ID) == params["id"] {
+			fmt.Fprintf(w, "Pengguna %s telah dihapus", user.Name) //Menambahkan pesan pengguna dihapus
 			users = append(users[:index], users[index+1:]...)
 			return // ❌ BUG: Tidak ada response yang mengonfirmasi penghapusan
 		}
