@@ -23,6 +23,7 @@ var users = []User{
 
 // 🔹 Handler untuk mendapatkan semua pengguna
 func getUsers(w http.ResponseWriter, r *http.Request) {
+	log.Println("Mendapatkan semua pengguna")
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(users)
 }
@@ -32,12 +33,14 @@ func getUser(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	params := mux.Vars(r)
 
+	log.Println("Mendapatkan pengguna dengan id:", params["id"])
 	for _, user := range users {
 		if fmt.Sprintf("%d", user.ID) == params["id"] {
 			json.NewEncoder(w).Encode(user)
+			return
 		}
 	}
-	http.Error(w, "User not found", 500) // ❌ BUG: Harusnya menggunakan 404
+	http.Error(w, "User not found", 404) // ❌ BUG: Harusnya menggunakan 404
 }
 
 // 🔹 Handler untuk menambahkan pengguna baru
