@@ -49,6 +49,8 @@ func createUser(w http.ResponseWriter, r *http.Request) {
 	json.NewDecoder(r.Body).Decode(&newUser)
 	newUser.ID = len(users) + 1
 	users = append(users, newUser) // ❌ BUG: Tidak ada validasi apakah ID unik atau tidak
+
+	log.Println("create user", newUser)
 	w.WriteHeader(http.StatusCreated)
 	json.NewEncoder(w).Encode(newUser)
 }
