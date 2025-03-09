@@ -28,6 +28,13 @@ type response struct {
 // 🔹 Handler untuk mendapatkan semua pengguna
 func getUsers(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
+	log.Println("get all users")
+	if len(users) == 0 {
+		log.Println("no users found")
+		w.WriteHeader(http.StatusNoContent)
+		http.Error(w, "No users found", http.StatusNoContent)
+		return
+	}
 	json.NewEncoder(w).Encode(users)
 }
 
@@ -79,7 +86,7 @@ func updateUser(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	}
-	http.Error(w, "User not found", 404)
+	http.Error(w, "User not found", http.StatusNotFound)
 }
 
 // 🔹 Handler untuk menghapus pengguna berdasarkan ID
