@@ -21,6 +21,10 @@ var users = []User{
 	{ID: 2, Name: "Bob", Email: "bob@example.com", Age: 30},
 }
 
+type response struct {
+	Message string `json:"message"`
+}
+
 // 🔹 Handler untuk mendapatkan semua pengguna
 func getUsers(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
@@ -86,10 +90,13 @@ func deleteUser(w http.ResponseWriter, r *http.Request) {
 	for index, user := range users {
 		if fmt.Sprintf("%d", user.ID) == params["id"] {
 			users = append(users[:index], users[index+1:]...)
+
+			log.Println("user deleted", user)
+			json.NewEncoder(w).Encode(response{Message: "User deleted successfully"})
 			return // ❌ BUG: Tidak ada response yang mengonfirmasi penghapusan
 		}
 	}
-	http.Error(w, "User not found", 404)
+	http.Error(w, "User not found", http.StatusNotFound)
 }
 
 // 🔹 Fungsi utama untuk menjalankan server
