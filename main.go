@@ -70,7 +70,8 @@ func updateUser(w http.ResponseWriter, r *http.Request) {
 		if fmt.Sprintf("%d", user.ID) == params["id"] {
 			var updatedUser User
 			json.NewDecoder(r.Body).Decode(&updatedUser)
-			users[index] = updatedUser // ❌ BUG: ID lama bisa berubah, harus tetap dipertahankan
+			updatedUser.ID = users[index].ID // Assign ID lama ke variabel baru
+			users[index] = updatedUser       // ❌ BUG: ID lama bisa berubah, harus tetap dipertahankan
 			json.NewEncoder(w).Encode(updatedUser)
 			return
 		}
