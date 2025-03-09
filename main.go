@@ -31,9 +31,11 @@ func getUsers(w http.ResponseWriter, r *http.Request) {
 func getUser(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	params := mux.Vars(r)
+	log.Println("get user by id", params["id"])
 
 	for _, user := range users {
 		if fmt.Sprintf("%d", user.ID) == params["id"] {
+			log.Println("user found", user)
 			json.NewEncoder(w).Encode(user)
 		}
 	}
@@ -45,6 +47,7 @@ func createUser(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	var newUser User
 	json.NewDecoder(r.Body).Decode(&newUser)
+	newUser.ID = len(users) + 1
 	users = append(users, newUser) // ❌ BUG: Tidak ada validasi apakah ID unik atau tidak
 	w.WriteHeader(http.StatusCreated)
 	json.NewEncoder(w).Encode(newUser)
