@@ -37,14 +37,18 @@ func getUser(w http.ResponseWriter, r *http.Request) {
 			json.NewEncoder(w).Encode(user)
 		}
 	}
-	http.Error(w, "User not found", 500) // ❌ BUG: Harusnya menggunakan 404
+	http.Error(w, "User not found", http.StatusNotFound) // ❌ BUG: Harusnya menggunakan 404
 }
 
 // 🔹 Handler untuk menambahkan pengguna baru
 func createUser(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	var newUser User
-	json.NewDecoder(r.Body).Decode(&newUser)
+	err := json.NewDecoder(r.Body).Decode(&newUser)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	} 
 	users = append(users, newUser) // ❌ BUG: Tidak ada validasi apakah ID unik atau tidak
 	w.WriteHeader(http.StatusCreated)
 	json.NewEncoder(w).Encode(newUser)
@@ -58,13 +62,18 @@ func updateUser(w http.ResponseWriter, r *http.Request) {
 	for index, user := range users {
 		if fmt.Sprintf("%d", user.ID) == params["id"] {
 			var updatedUser User
-			json.NewDecoder(r.Body).Decode(&updatedUser)
+			err := json.NewDecoder(r.Body).Decode(&updatedUser)
+			if err != nil {
+				log.Println("Failed to decode request body:", err)
+				http.Error(w, "Invalid input", http.StatusBadRequest)
+				return
+			}
 			users[index] = updatedUser // ❌ BUG: ID lama bisa berubah, harus tetap dipertahankan
 			json.NewEncoder(w).Encode(updatedUser)
 			return
 		}
 	}
-	http.Error(w, "User not found", 404)
+	http.Error(w, "User not found", http.StatusNotFound)
 }
 
 // 🔹 Handler untuk menghapus pengguna berdasarkan ID
@@ -75,10 +84,11 @@ func deleteUser(w http.ResponseWriter, r *http.Request) {
 	for index, user := range users {
 		if fmt.Sprintf("%d", user.ID) == params["id"] {
 			users = append(users[:index], users[index+1:]...)
+			w.WriteHeader(http.StatusNoContent)
 			return // ❌ BUG: Tidak ada response yang mengonfirmasi penghapusan
 		}
 	}
-	http.Error(w, "User not found", 404)
+	http.Error(w, "User not found", http.StatusNotFound)
 }
 
 // 🔹 Fungsi utama untuk menjalankan server
