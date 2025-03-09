@@ -32,7 +32,7 @@ func getUsers(w http.ResponseWriter, r *http.Request) {
 	if len(users) == 0 {
 		log.Println("no users found")
 		w.WriteHeader(http.StatusNoContent)
-		http.Error(w, "No users found", http.StatusNoContent)
+		json.NewEncoder(w).Encode(response{Message: "No users found"})
 		return
 	}
 	json.NewEncoder(w).Encode(users)
