@@ -60,11 +60,17 @@ func updateUser(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	params := mux.Vars(r)
 
+	log.Println("update user", params["id"])
+
 	for index, user := range users {
 		if fmt.Sprintf("%d", user.ID) == params["id"] {
 			var updatedUser User
 			json.NewDecoder(r.Body).Decode(&updatedUser)
+
 			users[index] = updatedUser // ❌ BUG: ID lama bisa berubah, harus tetap dipertahankan
+			users[index].ID = updatedUser.ID
+			users = append(users, updatedUser)
+			log.Println("user updated", updatedUser)
 			json.NewEncoder(w).Encode(updatedUser)
 			return
 		}
