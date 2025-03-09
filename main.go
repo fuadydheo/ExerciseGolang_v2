@@ -35,9 +35,10 @@ func getUser(w http.ResponseWriter, r *http.Request) {
 	for _, user := range users {
 		if fmt.Sprintf("%d", user.ID) == params["id"] {
 			json.NewEncoder(w).Encode(user)
+			return
 		}
 	}
-	http.Error(w, "User not found", 500) // ❌ BUG: Harusnya menggunakan 404
+	http.Error(w, "User not found", http.StatusNotFound)
 }
 
 // 🔹 Handler untuk menambahkan pengguna baru
@@ -93,6 +94,6 @@ func main() {
 	r.HandleFunc("/users/{id}", deleteUser).Methods("DELETE")
 
 	// Jalankan server
-	fmt.Println("Server running on port 8000")
-	log.Fatal(http.ListenAndServe(":8000", r))
+	fmt.Println("Server running on port 9000")
+	log.Fatal(http.ListenAndServe(":9000", r))
 }
