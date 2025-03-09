@@ -48,6 +48,14 @@ func createUser(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	var newUser User
 	json.NewDecoder(r.Body).Decode(&newUser)
+
+	log.Println("Membuat pengguna")
+	for _, user := range users {
+		if user.ID == newUser.ID {
+			fmt.Fprintf(w, "ID %d telah digunakan", newUser.ID)
+			return
+		}
+	}
 	users = append(users, newUser) // ❌ BUG: Tidak ada validasi apakah ID unik atau tidak
 	w.WriteHeader(http.StatusCreated)
 	json.NewEncoder(w).Encode(newUser)
