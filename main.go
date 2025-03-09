@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"time"
 
 	"github.com/gorilla/mux"
 )
@@ -106,6 +107,19 @@ func deleteUser(w http.ResponseWriter, r *http.Request) {
 	http.Error(w, "User not found", http.StatusNotFound)
 }
 
+func loggingMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		start := time.Now()
+		log.Printf("[%s] %s %s", r.Method, r.URL.Path, r.RemoteAddr)
+
+		// Lanjutkan ke handler berikutnya
+		next.ServeHTTP(w, r)
+
+		duration := time.Since(start)
+		log.Printf("[%s] %s %s - %v", r.Method, r.URL.Path, r.RemoteAddr, duration)
+	})
+}
+
 // 🔹 Fungsi utama untuk menjalankan server
 func main() {
 	r := mux.NewRouter()
@@ -116,6 +130,9 @@ func main() {
 	r.HandleFunc("/users", createUser).Methods("POST")
 	r.HandleFunc("/users/{id}", updateUser).Methods("PUT")
 	r.HandleFunc("/users/{id}", deleteUser).Methods("DELETE")
+
+	// Middleware
+	r.Use(loggingMiddleware)
 
 	// Jalankan server
 	fmt.Println("Server running on port 8000")
