@@ -54,7 +54,7 @@ func createUser(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	}
-	users = append(users, newUser) // ❌ BUG: Tidak ada validasi apakah ID unik atau tidak
+	users = append(users, newUser)
 	w.WriteHeader(http.StatusCreated)
 	json.NewEncoder(w).Encode(newUser)
 }
@@ -68,7 +68,10 @@ func updateUser(w http.ResponseWriter, r *http.Request) {
 		if fmt.Sprintf("%d", user.ID) == params["id"] {
 			var updatedUser User
 			json.NewDecoder(r.Body).Decode(&updatedUser)
-			users[index] = updatedUser // ❌ BUG: ID lama bisa berubah, harus tetap dipertahankan
+			//memastikan bahwa ID selalu sama
+			updatedUser.ID = user.ID
+			log.Println("Updating user with ID:", params["id"])
+			users[index] = updatedUser //
 			json.NewEncoder(w).Encode(updatedUser)
 			return
 		}
