@@ -45,6 +45,15 @@ func createUser(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	var newUser User
 	json.NewDecoder(r.Body).Decode(&newUser)
+
+	//check apakah ID user unik atau tidak
+	for _, existingUser := range users {
+		if existingUser.ID == newUser.ID {
+			log.Println("Duplicate ID:", newUser.ID)
+			http.Error(w, "Book ID already exists", http.StatusConflict) // 409 Conflict
+			return
+		}
+	}
 	users = append(users, newUser) // ❌ BUG: Tidak ada validasi apakah ID unik atau tidak
 	w.WriteHeader(http.StatusCreated)
 	json.NewEncoder(w).Encode(newUser)
