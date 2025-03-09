@@ -24,6 +24,7 @@ var users = []User{
 // 🔹 Handler untuk mendapatkan semua pengguna
 func getUsers(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
+	log.Println("Fetching all users")
 	json.NewEncoder(w).Encode(users)
 }
 
@@ -31,7 +32,7 @@ func getUsers(w http.ResponseWriter, r *http.Request) {
 func getUser(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	params := mux.Vars(r)
-
+	log.Println("Fetching user with ID:", params["id"])
 	for _, user := range users {
 		if fmt.Sprintf("%d", user.ID) == params["id"] {
 			json.NewEncoder(w).Encode(user)
@@ -48,7 +49,8 @@ func createUser(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
-	} 
+	}
+	log.Println("Adding new User:", newUser.Name)
 	users = append(users, newUser) // ❌ BUG: Tidak ada validasi apakah ID unik atau tidak
 	w.WriteHeader(http.StatusCreated)
 	json.NewEncoder(w).Encode(newUser)
@@ -58,7 +60,7 @@ func createUser(w http.ResponseWriter, r *http.Request) {
 func updateUser(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	params := mux.Vars(r)
-
+	log.Println("Updating user with ID:", params["id"])
 	for index, user := range users {
 		if fmt.Sprintf("%d", user.ID) == params["id"] {
 			var updatedUser User
@@ -80,7 +82,7 @@ func updateUser(w http.ResponseWriter, r *http.Request) {
 func deleteUser(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	params := mux.Vars(r)
-
+	log.Println("Deleting user with ID:", params["id"])
 	for index, user := range users {
 		if fmt.Sprintf("%d", user.ID) == params["id"] {
 			users = append(users[:index], users[index+1:]...)
