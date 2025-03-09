@@ -37,7 +37,7 @@ func getUser(w http.ResponseWriter, r *http.Request) {
 			json.NewEncoder(w).Encode(user)
 		}
 	}
-	http.Error(w, "User not found", 500) // ❌ BUG: Harusnya menggunakan 404
+	http.Error(w, "User not found", http.StatusNotFound)
 }
 
 // 🔹 Handler untuk menambahkan pengguna baru
